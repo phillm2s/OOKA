@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="CLI">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../SharedRessources/CLI/src/main/java" />
+    </SOURCES>
+  </library>
+</component>
