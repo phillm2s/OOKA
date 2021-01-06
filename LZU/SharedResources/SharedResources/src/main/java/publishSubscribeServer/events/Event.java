@@ -1,4 +1,4 @@
-package observer;
+package publishSubscribeServer.events;
 
 public class Event {
     private String message = "";

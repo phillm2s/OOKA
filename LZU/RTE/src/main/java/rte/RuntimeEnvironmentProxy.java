@@ -1,19 +1,10 @@
 package rte;
 //Proxy for LZU
 
-import component.Component;
+import dtos.ComponentState;
 import exceptions.*;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //ComponentAssembler
     private boolean quit = false;
@@ -41,7 +32,7 @@ public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //Componen
     }
 
     @Override
-    public String deployComponent(String path, String componentName) throws UnderlyingComponentUnavailableException, ComponentNotFoundException {
+    public String deployComponent(String path, String componentName) throws UnderlyingComponentUnavailableException, ComponentNotFoundException, MissingAnnotationException {
         return rte.deployComponent(path,componentName);
     }
 
@@ -56,7 +47,7 @@ public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //Componen
     }
 
     @Override
-    public String getComponentState(String componentID) throws UnderlyingComponentUnavailableException, ComponentNotFoundException {
+    public ComponentState getComponentState(String componentID) throws UnderlyingComponentUnavailableException, ComponentNotFoundException, ComponentDelegateException {
         return rte.getComponentState(componentID);
     }
 

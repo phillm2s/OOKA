@@ -1,6 +1,11 @@
 package rte;
 
+import annotations.Start;
+import annotations.State;
+import annotations.Stop;
+import annotations.Subscribe;
 import component.Component;
+import exceptions.MissingAnnotationException;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -14,7 +19,7 @@ import java.util.jar.JarFile;
 public class ReflectionClassLoader {
 
 
-    public Component loadComponentFromFilesystem(String jarDirectory, String componentName) throws IOException, ClassNotFoundException {    //https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
+    public Component loadComponentFromFilesystem(String jarDirectory, String componentName) throws IOException, ClassNotFoundException, MissingAnnotationException {    //https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
         /**
          *
          * @param jarDirectory path to the directory
@@ -24,6 +29,7 @@ public class ReflectionClassLoader {
          * @throws ClassNotFoundException
          */
 
+        boolean start= false, stop= false, state= false;
         String pathToJar = jarDirectory+"\\"+componentName+".jar";
         JarFile jarFile = new JarFile(pathToJar);
         Enumeration<JarEntry> e = jarFile.entries();
@@ -45,16 +51,25 @@ public class ReflectionClassLoader {
 
             //get methods via annotations
             for (Method m : c.getMethods()) {
-                for (Annotation annotation : m.getAnnotations()) {
-                    if (annotation.annotationType().getSimpleName().equals("Start")) //Identify annotations via Name
-                        component.setStartMethod(m);
-                    else if (annotation.annotationType().getSimpleName().equals("Stop"))
-                        component.setStopMethod(m);
-                    else if (annotation.annotationType().getSimpleName().equals("Subscribe"))
-                        component.setSubscribeMethod(m);
+                if (m.isAnnotationPresent(Start.class) ) { //Identify annotations via Name
+                    component.setStartMethod(m);
+                    start=true;
                 }
+                else if (m.isAnnotationPresent(Stop.class) ) {
+                    component.setStopMethod(m);
+                    stop=true;
+                }
+                else if (m.isAnnotationPresent(Subscribe.class) )
+                    component.setSubscribeMethod(m);
+                else if (m.isAnnotationPresent(State.class) ) { //annotation.annotationType().getSimpleName().equals("State")
+                    component.setGetStateMethod(m);
+                    state=true;
+                }
+
             }
         }
+        if(!start || !stop || !state)
+            throw new MissingAnnotationException();
         return component;
     }
 }

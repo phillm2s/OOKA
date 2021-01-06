@@ -1,10 +1,7 @@
 package userInterfaces.console;
 
 import component.Component;
-import exceptions.AlreadyRunningException;
-import exceptions.ComponentDelegateException;
-import exceptions.ComponentNotFoundException;
-import exceptions.UnderlyingComponentUnavailableException;
+import exceptions.*;
 import rte.IRuntimeEnvironment;
 
 import java.util.Scanner;
@@ -31,7 +28,11 @@ public class CommandlineInterpreter {
 
         while(listen ==false){
             String input = keyboard.nextLine();
-            interpret(input);
+            try {
+                interpret(input);
+            }catch (Exception e){
+                e.printStackTrace(); //uncatched exception should never be reached
+            }
         }
     }
 
@@ -47,7 +48,7 @@ public class CommandlineInterpreter {
         }
         else if (input.equals(CommandlineCommands.RTE_STOP.getCommand())) {
             rte.rteStop();
-            if(rte.rteIsRunning())
+            if(!rte.rteIsRunning())
                 System.out.println("RTE stopped.");
             else
                 System.out.println("Stopping RTE failed.");
@@ -79,6 +80,8 @@ public class CommandlineInterpreter {
                 e.printStackTrace();
             } catch (UnderlyingComponentUnavailableException e1){
                 e1.printStackTrace();
+            } catch (MissingAnnotationException e) {
+                e.printStackTrace();
             }
         }
 
@@ -106,16 +109,23 @@ public class CommandlineInterpreter {
             }
         }
 
-        else if (words.length==3 && input.startsWith(CommandlineCommands.COMPONENT_STATE.getCommand())) {
-            String s = "Components:\n";
+        else if (input.equals(CommandlineCommands.COMPONENTS_STATE.getCommand())) {
             try {
+                String s = "Components:\n";
                 for (String component : rte.getComponentsID()) {
                     try {
-                        s += rte.getComponentState(component) + "\n";
+                        s +=  component+":\n";
+                        if(rte.getComponentState(component).isRunning)
+                            s +=  "Status: active\n";
+                        else
+                            s +=  "Status: inactive\n";
                     } catch (ComponentNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (ComponentDelegateException e) {
                         e.printStackTrace();
                     }
                 }
+                System.out.println(s);
             } catch (UnderlyingComponentUnavailableException e) {
                 e.printStackTrace();
             }

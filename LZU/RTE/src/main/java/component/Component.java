@@ -1,9 +1,11 @@
 package component;
 
+import dtos.ComponentState;
 import exceptions.AlreadyRunningException;
 import exceptions.ComponentDelegateException;
-import observer.Event;
-import observer.IComponentObserver;
+import publishSubscribeServer.IPublishSubscriberServer;
+import publishSubscribeServer.events.Event;
+import publishSubscribeServer.IComponentObserver;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,10 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class Component implements Runnable, IComponentObserver {
+public class Component implements Runnable {
     public static final String JAR_DIRECTORY = "..\\componentJars";
-
-    private Thread thread;
 
     private HashMap<String, Class> classes= new HashMap<>();
 
@@ -23,6 +23,7 @@ public class Component implements Runnable, IComponentObserver {
     private Method startMethod;
     private Method stopMethod;
     private Method subscribeMethod;
+    private Method getStateMethod;
 
     private String name;
 
@@ -30,7 +31,6 @@ public class Component implements Runnable, IComponentObserver {
 
     public Component (String name){
         this.name = name;
-        thread = new Thread(this);
     }
 
 
@@ -44,7 +44,7 @@ public class Component implements Runnable, IComponentObserver {
 
     public void start() throws AlreadyRunningException {
         if (!isRunning) {
-            thread.start();
+            new Thread(this).start();
             isRunning = true;
         }
         else
@@ -55,6 +55,15 @@ public class Component implements Runnable, IComponentObserver {
         if (isRunning) {
             stopMethod.invoke(null);
             isRunning = false;
+            int i=0;
+        }
+    }
+
+    public ComponentState getState() throws ComponentDelegateException {
+        try{
+            return (ComponentState) getStateMethod.invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ComponentDelegateException();
         }
     }
 
@@ -66,13 +75,15 @@ public class Component implements Runnable, IComponentObserver {
         this.subscribeMethod = subscribe;
     }
 
-    public void subscribe(IComponentObserver observer) throws ComponentDelegateException {
-        if(!isSubscribable())
-            throw new ComponentDelegateException("Component not subscibable.");
+    public void setGetStateMethod(Method getState){
+        this.getStateMethod = getState;
+    }
+
+    public void subscribe(IPublishSubscriberServer iPublishSubscriberServer) throws ComponentDelegateException {
         try {
-            subscribeMethod.invoke(null,"hi");
+            subscribeMethod.invoke(null,iPublishSubscriberServer);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ComponentDelegateException();
+            throw new ComponentDelegateException("Subscription failed");
         }
     }
 
@@ -90,16 +101,9 @@ public class Component implements Runnable, IComponentObserver {
     @Override
     public void run() {
         try {
-            if(isSubscribable())
-                subscribe((IComponentObserver)this);
             startMethod.invoke(null);
-        } catch (IllegalAccessException | ComponentDelegateException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void notify(Event e) {
-        System.out.println("blub");
     }
 }

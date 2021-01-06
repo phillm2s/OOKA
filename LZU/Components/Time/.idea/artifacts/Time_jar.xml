@@ -2,8 +2,9 @@
   <artifact type="jar" name="Time:jar">
     <output-path>$PROJECT_DIR$/../../componentJars</output-path>
     <root id="archive" name="Time.jar">
-      <element id="module-output" name="Time" />
       <element id="module-output" name="CLI" />
+      <element id="module-output" name="Time" />
+      <element id="module-output" name="SharedResources" />
     </root>
   </artifact>
 </component>

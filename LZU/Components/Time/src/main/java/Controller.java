@@ -1,25 +1,26 @@
 
-import annotations.Component;
 import annotations.Start;
+import annotations.State;
 import annotations.Stop;
 import annotations.Subscribe;
-import observer.Event;
-import observer.IComponentObserver;
+import dtos.ComponentState;
+import publishSubscribeServer.IComponentObserver;
+import publishSubscribeServer.IPublishSubscriberServer;
+import publishSubscribeServer.ITopic;
+import publishSubscribeServer.events.Event;
+import publishSubscribeServer.events.StartEvent;
+import publishSubscribeServer.events.StopEvent;
 
-import java.util.ArrayList;
-
-@Component
-public class Controller implements ICommandLineInterpreter {
-    private static Thread thread = null;
+public class Controller implements ICommandLineInterpreter, IComponentObserver {
     private static Controller instance = null;
     private static CommandLineInterface cli = CommandLineInterface.getInstance();
-    private static ArrayList<IComponentObserver> componentObserver = new ArrayList<>();
+    private static IPublishSubscriberServer iPublishSubscriberServer;
 
     private CurrentTime currentTime;
 
 
     private Controller(){
-        cli.setTitle("Test annotations.Component");
+        cli.setTitle("Time Component");
         cli.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -27,45 +28,64 @@ public class Controller implements ICommandLineInterpreter {
             }
         });
 
-        CurrentTime currentTime= new CurrentTime();
+        currentTime= new CurrentTime();
     }
 
-    @Start //Entry point
-    public static void start(){
-        if(instance==null) {
+    public static Controller getInstance(){
+        if(instance==null)
             instance = new Controller();
+        return instance;
+    }
+
+    @Start
+    public static void start() {
+        if (!getInstance().currentTime.isRunning()) {
+            if (iPublishSubscriberServer != null) {
+                //This components also want to notify all "stateChange" subscribers that its state changes to "started" in this moment
+                iPublishSubscriberServer.createTopic("stateChange").notify(new StartEvent().setMessage("Component started."));
+            }
             instance.currentTime.run();
-            notifiyAll(new Event().setMessage("Time annotations.Component started."));
         }
         else {
-            cli.print("Test annotations.Component already running.");
+            cli.print("Component already running.");
         }
     }
 
     @Stop
     public static void stop(){
-        cli.print("annotations.Stop annotations.Component");
-        instance.currentTime.stop();
+        if (getInstance().currentTime.isRunning()) {
+            cli.print("stop component...");
+            if (iPublishSubscriberServer != null)
+                iPublishSubscriberServer.createTopic("stateChange").notify(new StopEvent().setMessage("Component stopped."));
+            getInstance().currentTime.stop();
+        } else
+            cli.print("Component not started.");
     }
 
     @Subscribe
-    public static void subscribe(IComponentObserver observer){
-        componentObserver.add(observer);
+    public static void setPublishSubscribeServer(IPublishSubscriberServer iServer){
+        iPublishSubscriberServer = iServer;
+        //this component wants to know if other components changes there state
+        //create stateChange topic IF NOT EXIST and subscribe
+        ITopic topic = iPublishSubscriberServer.createTopic("stateChange");
+        topic.subscribe((IComponentObserver) getInstance());
+
+        cli.print("Subscribe topic: "+topic.getName());
     }
 
-    private static void notifiyAll(Event e){
-        for ( IComponentObserver obser : componentObserver )
-            obser.notify(e);
+    @State
+    public static ComponentState getState(){
+        return new ComponentState().setIsRunning(instance.currentTime.isRunning());
     }
 
-
-
-
-    //region ============ commandLineInterpreter Interface ================
     @Override
     public void handleCommand(String input) {
 
     }
 
-    //endregion
+    @Override
+    public void notify(Event e) {
+        cli.print("Received notification: "+ e.getMessage());
+    }
+
 }

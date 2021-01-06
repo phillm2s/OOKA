@@ -9,7 +9,7 @@ public abstract class CommandlineCommands {
 
     public static final Command COMPONENT_START = new Command().setCommand("component -start").setDescription("[name]");
     public static final Command COMPONENT_STOP = new Command().setCommand("component -stop").setDescription("[name]");
-    public static final Command COMPONENT_STATE = new Command().setCommand("component -state").setDescription("[name] Display the state of the given component.");
+    public static final Command COMPONENTS_STATE = new Command().setCommand("component -state").setDescription("Display the state of ALL components.");
 
 
     public static String getHelp(){
@@ -21,6 +21,6 @@ public abstract class CommandlineCommands {
 
                 CommandlineCommands.COMPONENT_START.toString()+"\n" +
                 CommandlineCommands.COMPONENT_STOP.toString()+"\n" +
-                CommandlineCommands.COMPONENT_STATE.toString();
+                CommandlineCommands.COMPONENTS_STATE.toString();
     }
 }
