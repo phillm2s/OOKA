@@ -1,11 +1,12 @@
-package publishSubscribeServer;
+package rte.publishSubscribeServer;
 
 import publishSubscribeServer.IComponentObserver;
+import publishSubscribeServer.ITopic;
 import publishSubscribeServer.events.Event;
 
 import java.util.ArrayList;
 
-public class Topic implements ITopic{
+public class Topic implements ITopic {
 
     private ArrayList<IComponentObserver> subscriber = new ArrayList<>();
     private String name ="";

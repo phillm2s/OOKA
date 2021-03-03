@@ -1,9 +1,12 @@
-package publishSubscribeServer;
+package rte.publishSubscribeServer;
+
+import publishSubscribeServer.IPublishSubscriberServer;
+import publishSubscribeServer.ITopic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PublishSubscriberServer implements IPublishSubscriberServer{
+public class PublishSubscriberServer implements IPublishSubscriberServer {
     private HashMap<String,Topic> topics = new HashMap<>();
 
     @Override

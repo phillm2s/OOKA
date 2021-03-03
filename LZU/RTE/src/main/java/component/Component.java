@@ -4,16 +4,16 @@ import dtos.ComponentState;
 import exceptions.AlreadyRunningException;
 import exceptions.ComponentDelegateException;
 import publishSubscribeServer.IPublishSubscriberServer;
-import publishSubscribeServer.events.Event;
 import publishSubscribeServer.IComponentObserver;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class Component implements Runnable {
+public class Component{
     public static final String JAR_DIRECTORY = "..\\componentJars";
 
     private HashMap<String, Class> classes= new HashMap<>();
@@ -22,41 +22,53 @@ public class Component implements Runnable {
 
     private Method startMethod;
     private Method stopMethod;
+    private Method closeMethod;
     private Method subscribeMethod;
     private Method getStateMethod;
 
     private String name;
+    //private boolean threadRunning=false;
+    //private Thread thread;
+    private boolean started = false;
 
-    private boolean isRunning = false;
+
 
     public Component (String name){
         this.name = name;
     }
 
-
     public void addClass(Class c){
         classes.put(c.getName(), c);
     }
 
-    public void setStartMethod(Method start){
-        this.startMethod = start;
-    }
+    public void startAsync() throws AlreadyRunningException {
+        if (!started) {
+            new Thread(() -> {
+                try {
+                    System.out.println("thread started.");
+                    startMethod.invoke(null);
+                    System.out.println("thread finished.");
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (Exception e){
 
-    public void start() throws AlreadyRunningException {
-        if (!isRunning) {
-            new Thread(this).start();
-            isRunning = true;
+                }
+            }).start();
+            started=true;
         }
         else
             throw new AlreadyRunningException();
     }
 
     public void stop() throws InvocationTargetException, IllegalAccessException {
-        if (isRunning) {
+        if (started) {
             stopMethod.invoke(null);
-            isRunning = false;
-            int i=0;
+            started=false;
         }
+    }
+
+    public void close() throws InvocationTargetException, IllegalAccessException {
+        closeMethod.invoke(null);
     }
 
     public ComponentState getState() throws ComponentDelegateException {
@@ -67,8 +79,16 @@ public class Component implements Runnable {
         }
     }
 
+    public void setStartMethod(Method start){
+        this.startMethod = start;
+    }
+
     public void setStopMethod(Method stop){
         this.stopMethod = stop;
+    }
+
+    public void setCloseMethod(Method close){
+        this.closeMethod = close;
     }
 
     public void setSubscribeMethod(Method subscribe) {
@@ -97,13 +117,4 @@ public class Component implements Runnable {
         return name;
     }
 
-
-    @Override
-    public void run() {
-        try {
-            startMethod.invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
 }

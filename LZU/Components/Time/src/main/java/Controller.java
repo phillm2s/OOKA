@@ -1,8 +1,5 @@
 
-import annotations.Start;
-import annotations.State;
-import annotations.Stop;
-import annotations.Subscribe;
+import annotations.*;
 import dtos.ComponentState;
 import publishSubscribeServer.IComponentObserver;
 import publishSubscribeServer.IPublishSubscriberServer;
@@ -61,6 +58,13 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         } else
             cli.print("Component not started.");
     }
+
+    @Close
+    public static void close(){
+        stop();
+        cli.close();
+    }
+
 
     @Subscribe
     public static void setPublishSubscribeServer(IPublishSubscriberServer iServer){

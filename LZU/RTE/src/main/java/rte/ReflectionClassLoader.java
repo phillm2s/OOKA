@@ -1,14 +1,10 @@
 package rte;
 
-import annotations.Start;
-import annotations.State;
-import annotations.Stop;
-import annotations.Subscribe;
+import annotations.*;
 import component.Component;
 import exceptions.MissingAnnotationException;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -16,10 +12,10 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class ReflectionClassLoader {
+public abstract class ReflectionClassLoader {
 
 
-    public Component loadComponentFromFilesystem(String jarDirectory, String componentName) throws IOException, ClassNotFoundException, MissingAnnotationException {    //https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
+    public static Component loadComponentFromFilesystem(String jarDirectory, String componentName) throws IOException, ClassNotFoundException, MissingAnnotationException {    //https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
         /**
          *
          * @param jarDirectory path to the directory
@@ -29,7 +25,7 @@ public class ReflectionClassLoader {
          * @throws ClassNotFoundException
          */
 
-        boolean start= false, stop= false, state= false;
+        boolean start= false, stop= false, close=false, state= false; //required annotations
         String pathToJar = jarDirectory+"\\"+componentName+".jar";
         JarFile jarFile = new JarFile(pathToJar);
         Enumeration<JarEntry> e = jarFile.entries();
@@ -59,6 +55,10 @@ public class ReflectionClassLoader {
                     component.setStopMethod(m);
                     stop=true;
                 }
+                else if (m.isAnnotationPresent(Close.class) ) {
+                    component.setCloseMethod(m);
+                    close=true;
+                }
                 else if (m.isAnnotationPresent(Subscribe.class) )
                     component.setSubscribeMethod(m);
                 else if (m.isAnnotationPresent(State.class) ) { //annotation.annotationType().getSimpleName().equals("State")
@@ -72,4 +72,7 @@ public class ReflectionClassLoader {
             throw new MissingAnnotationException();
         return component;
     }
+
+
+
 }

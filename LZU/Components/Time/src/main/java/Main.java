@@ -1,16 +1,19 @@
-import publishSubscribeServer.IComponentObserver;
-import publishSubscribeServer.IPublishSubscriberServer;
-import publishSubscribeServer.PublishSubscriberServer;
-import publishSubscribeServer.events.Event;
 
-import javax.naming.ldap.Control;
 
 public class Main {
 
     public static void main(String[] args){
-        PublishSubscriberServer publishSubscriberServer = new PublishSubscriberServer();
-        Controller.setPublishSubscribeServer((IPublishSubscriberServer)publishSubscriberServer);
-        Controller.start();
+        new Thread(() -> {
+            Controller.start();
+            System.out.println("A");
+        }).start();
 
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Controller.stop();
     }
 }

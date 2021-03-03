@@ -41,33 +41,29 @@ public class CommandlineInterpreter {
         
         if(input.equals(CommandlineCommands.RTE_START.getCommand())) {
             rte.rteStart();
-            if(rte.rteIsRunning())
+            if(rte.rteGetState().running)
                 System.out.println("RTE started.");
             else
                 System.out.println("Starting RTE failed.");
         }
         else if (input.equals(CommandlineCommands.RTE_STOP.getCommand())) {
             rte.rteStop();
-            if(!rte.rteIsRunning())
+            if(!rte.rteGetState().running)
                 System.out.println("RTE stopped.");
             else
                 System.out.println("Stopping RTE failed.");
         }
         else if (input.equals((CommandlineCommands.RTE_STATE).getCommand())) {
-            String s = "RTE Running: " + rte.rteIsRunning() + "\n" +
+            String s = "RTE Running: " + rte.rteGetState().running + "\n" +
                     "Deployed Components:\n";
-            try {
-                if(rte.getComponentsID().size()==0)
-                    s+= "none";
-            } catch (UnderlyingComponentUnavailableException e) {
-                e.printStackTrace();
-            }
-            try {
-                for (String c : rte.getComponentsID())
-                    s+= c+"\n";
-            } catch (UnderlyingComponentUnavailableException e) {
-                e.printStackTrace();
-            }
+
+            if(rte.getComponentsID().size()==0)
+                s+= "none";
+
+
+            for (String c : rte.getComponentsID())
+                s+= c+"\n";
+
             System.out.println(s);
         }
 
@@ -78,7 +74,7 @@ public class CommandlineInterpreter {
                 System.out.println(componentName +" deployed with componentID: "+componentID);
             } catch (ComponentNotFoundException e) {
                 e.printStackTrace();
-            } catch (UnderlyingComponentUnavailableException e1){
+            } catch (ComponentUnavailableException e1){
                 e1.printStackTrace();
             } catch (MissingAnnotationException e) {
                 e.printStackTrace();
@@ -90,7 +86,7 @@ public class CommandlineInterpreter {
                 rte.componentStart(words[2]);
             } catch (ComponentNotFoundException e) {
                 e.printStackTrace();
-            } catch (UnderlyingComponentUnavailableException e) {
+            } catch (ComponentUnavailableException e) {
                 e.printStackTrace();
             } catch (AlreadyRunningException e) {
                 e.printStackTrace();
@@ -102,7 +98,7 @@ public class CommandlineInterpreter {
                 rte.componentStop(words[2]);
             } catch (ComponentNotFoundException e) {
                 e.printStackTrace();
-            } catch (UnderlyingComponentUnavailableException e) {
+            } catch (ComponentUnavailableException e) {
                 e.printStackTrace();
             } catch (ComponentDelegateException e) {
                 e.printStackTrace();
@@ -126,13 +122,13 @@ public class CommandlineInterpreter {
                     }
                 }
                 System.out.println(s);
-            } catch (UnderlyingComponentUnavailableException e) {
+            } catch (ComponentUnavailableException e) {
                 e.printStackTrace();
             }
         }
 
         else
-            System.out.println("Comment not found.");
+            System.out.println("Command not found.");
         
         
         return this;

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class CommandLineInterface extends JFrame {
@@ -64,6 +65,11 @@ public class CommandLineInterface extends JFrame {
         //scroll to the end
         textArea.append("\n"+msg);
         scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+    }
+
+    public void close(){
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+        this.dispose();
     }
 
     public void subscribe(ICommandLineInterpreter cli) {

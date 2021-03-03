@@ -4,8 +4,10 @@ import component.Component;
 import dtos.ComponentState;
 import exceptions.*;
 import publishSubscribeServer.IPublishSubscriberServer;
-import publishSubscribeServer.PublishSubscriberServer;
+import rte.publishSubscribeServer.PublishSubscriberServer;
+import userInterfaces.RTEState;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
         for (Component component : components.values()) {
             try {
                 component.stop();
+                component.close();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -38,14 +41,32 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public boolean rteIsRunning() {
-        return running;
+    public RTEState rteGetState() {
+        return new RTEState().setRunning(running);
     }
 
     @Override
-    public String deployComponent(String path, String componentName) throws ComponentNotFoundException, UnderlyingComponentUnavailableException, MissingAnnotationException {
+    public ArrayList<String> getDeployableComponents(String path) {
+        //list all .jar files inside directory
+        String[] fileNames = new File(path).list((dir, name) -> name.toLowerCase().endsWith(".jar"));
+        //Try to deploy each file. if its possible its valid. but dont store the deployed file
+        ArrayList<String> validComponents = new ArrayList<>();
+        for(String f : fileNames){
+            f= f.replace(".jar","");
+            try{
+                ReflectionClassLoader.loadComponentFromFilesystem(path, f);
+                validComponents.add(f);
+            }catch(Exception e){
+                System.out.println(f+ "i s no valid Component");
+            }
+        }
+        return validComponents;
+    }
+
+    @Override
+    public String deployComponent(String path, String componentName) throws ComponentNotFoundException, ComponentUnavailableException, MissingAnnotationException {
         if (!running)
-            throw new UnderlyingComponentUnavailableException();
+            throw new ComponentUnavailableException();
         String id = componentName;
         int i=0;
         //unique component id
@@ -53,7 +74,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
             id = componentName + ++i;
 
         try {
-            Component newComponent = new ReflectionClassLoader().loadComponentFromFilesystem(Component.JAR_DIRECTORY, componentName);
+            Component newComponent = ReflectionClassLoader.loadComponentFromFilesystem(path, componentName);
             components.put(id,newComponent);
             if(newComponent.isSubscribable())
                 try {
@@ -68,18 +89,22 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public void deleteComponent(String componentID) throws ComponentNotFoundException, UnderlyingComponentUnavailableException {
+    public void removeComponent(String componentID) throws ComponentNotFoundException, ComponentUnavailableException {
         if (!running)
-            throw new UnderlyingComponentUnavailableException();
+            throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
             throw new ComponentNotFoundException();
+
+        try {
+            components.get(componentID).close();
+        }catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
         components.remove(componentID);
     }
 
     @Override
-    public ArrayList<String> getComponentsID() throws UnderlyingComponentUnavailableException {
-        if (!running)
-            throw new UnderlyingComponentUnavailableException();
+    public ArrayList<String> getComponentsID() {
         ArrayList<String> ids = new ArrayList<>();
         for(String id : components.keySet())
             ids.add(id);
@@ -87,27 +112,27 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public ComponentState getComponentState(String componentID) throws ComponentNotFoundException, UnderlyingComponentUnavailableException, ComponentDelegateException {
+    public ComponentState getComponentState(String componentID) throws ComponentNotFoundException, ComponentUnavailableException, ComponentDelegateException {
         if (!running)
-            throw new UnderlyingComponentUnavailableException();
+            throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
             throw new ComponentNotFoundException();
         return components.get(componentID).getState();
     }
 
     @Override
-    public void componentStart(String componentID) throws ComponentNotFoundException, AlreadyRunningException, UnderlyingComponentUnavailableException {
+    public void componentStart(String componentID) throws ComponentNotFoundException, AlreadyRunningException, ComponentUnavailableException {
         if (!running)
-            throw new UnderlyingComponentUnavailableException();
+            throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
             throw new ComponentNotFoundException(componentID);
-        components.get(componentID).start();
+        components.get(componentID).startAsync();
     }
 
     @Override
-    public void componentStop(String componentID) throws ComponentNotFoundException, UnderlyingComponentUnavailableException, ComponentDelegateException {
+    public void componentStop(String componentID) throws ComponentNotFoundException, ComponentUnavailableException, ComponentDelegateException {
         if (!running)
-            throw new UnderlyingComponentUnavailableException();
+            throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
             throw new ComponentNotFoundException(componentID);
         try {
