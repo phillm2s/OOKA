@@ -1,6 +1,6 @@
 package userInterfaces.console;
 
-import component.Component;
+import component.Config;
 import exceptions.*;
 import rte.IRuntimeEnvironment;
 
@@ -70,7 +70,7 @@ public class CommandlineInterpreter {
         else if(input.startsWith(CommandlineCommands.RTE_DEPLOY.getCommand())){
             String componentName = input.substring(input.lastIndexOf(" ")+1);
             try {
-                String componentID = rte.deployComponent( Component.JAR_DIRECTORY,componentName);
+                String componentID = rte.deployComponent( Config.JAR_DIRECTORY,componentName);
                 System.out.println(componentName +" deployed with componentID: "+componentID);
             } catch (ComponentNotFoundException e) {
                 e.printStackTrace();

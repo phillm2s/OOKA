@@ -4,9 +4,7 @@ import dtos.ComponentState;
 import publishSubscribeServer.IComponentObserver;
 import publishSubscribeServer.IPublishSubscriberServer;
 import publishSubscribeServer.ITopic;
-import publishSubscribeServer.events.Event;
-import publishSubscribeServer.events.StartEvent;
-import publishSubscribeServer.events.StopEvent;
+import publishSubscribeServer.events.*;
 
 public class Controller implements ICommandLineInterpreter, IComponentObserver {
     private static Controller instance = null;
@@ -14,34 +12,40 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
     private static IPublishSubscriberServer iPublishSubscriberServer;
 
     private CurrentTime currentTime;
+    private String componentID;
 
 
-    private Controller(){
-        cli.setTitle("Time Component");
+    private Controller(String componentID){
+        this.componentID = componentID;
+        cli.setTitle("Time Component::"+componentID);
+        cli.subscribe(this);
         cli.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                Controller.stop();
+                Controller.close();
+                cli.dispose();
             }
         });
-
         currentTime= new CurrentTime();
     }
 
-    public static Controller getInstance(){
-        if(instance==null)
-            instance = new Controller();
-        return instance;
+    @Instantiate
+    public static void instantiate(String componentID){
+        instance= new Controller(componentID);
+        if (iPublishSubscriberServer != null)
+            iPublishSubscriberServer.createTopic("stateChange")
+                    .notify(new InstantiateEvent().setMessage("Component"+ instance.componentID+" instantiated."));
     }
 
     @Start
     public static void start() {
-        if (!getInstance().currentTime.isRunning()) {
-            if (iPublishSubscriberServer != null) {
-                //This components also want to notify all "stateChange" subscribers that its state changes to "started" in this moment
-                iPublishSubscriberServer.createTopic("stateChange").notify(new StartEvent().setMessage("Component started."));
-            }
-            instance.currentTime.run();
+        if (!instance.currentTime.isRunning()) {
+            if (iPublishSubscriberServer != null)
+                iPublishSubscriberServer.createTopic("stateChange")
+                        .notify(new StartEvent()
+                                .setMessage("Component"+ instance.componentID+" started."));
+            instance.currentTime.runAsync();
+            cli.print("Component started");
         }
         else {
             cli.print("Component already running.");
@@ -50,21 +54,24 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
 
     @Stop
     public static void stop(){
-        if (getInstance().currentTime.isRunning()) {
-            cli.print("stop component...");
+        if(instance.currentTime.isRunning()) {
             if (iPublishSubscriberServer != null)
-                iPublishSubscriberServer.createTopic("stateChange").notify(new StopEvent().setMessage("Component stopped."));
-            getInstance().currentTime.stop();
-        } else
-            cli.print("Component not started.");
+                iPublishSubscriberServer.createTopic("stateChange")
+                        .notify(new StopEvent().setMessage("Component" + instance.componentID + " stopped."));
+
+            instance.currentTime.stop();
+            cli.print("Component stopped");
+        }
     }
 
     @Close
     public static void close(){
         stop();
+        if (iPublishSubscriberServer != null)
+            iPublishSubscriberServer.createTopic("stateChange")
+                    .notify(new CloseEvent().setMessage("Component"+ instance.componentID+" closed."));
         cli.close();
     }
-
 
     @Subscribe
     public static void setPublishSubscribeServer(IPublishSubscriberServer iServer){
@@ -72,15 +79,25 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         //this component wants to know if other components changes there state
         //create stateChange topic IF NOT EXIST and subscribe
         ITopic topic = iPublishSubscriberServer.createTopic("stateChange");
-        topic.subscribe((IComponentObserver) getInstance());
+        topic.subscribe((IComponentObserver) instance);
 
         cli.print("Subscribe topic: "+topic.getName());
     }
 
+    @Log
+    public static void setLogger(ILogger iLogger){
+
+    }
+
     @State
     public static ComponentState getState(){
-        return new ComponentState().setIsRunning(instance.currentTime.isRunning());
+        return new ComponentState()
+                .setIsRunning(instance.currentTime.isRunning())
+                .setComponentName("Time")
+                .setComponentID(instance.componentID);
     }
+
+
 
     @Override
     public void handleCommand(String input) {

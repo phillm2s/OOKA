@@ -1,4 +1,4 @@
-package rte;
+package component;
 
 import annotations.*;
 import component.Component;
@@ -14,8 +14,7 @@ import java.util.jar.JarFile;
 
 public abstract class ReflectionClassLoader {
 
-
-    public static Component loadComponentFromFilesystem(String jarDirectory, String componentName) throws IOException, ClassNotFoundException, MissingAnnotationException {    //https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
+    public static Component loadComponentFromFilesystem(String jarDirectory, String componentName, String ComponentID) throws IOException, ClassNotFoundException, MissingAnnotationException {    //https://stackoverflow.com/questions/11016092/how-to-load-classes-at-runtime-from-a-folder-or-jar
         /**
          *
          * @param jarDirectory path to the directory
@@ -25,7 +24,7 @@ public abstract class ReflectionClassLoader {
          * @throws ClassNotFoundException
          */
 
-        boolean start= false, stop= false, close=false, state= false; //required annotations
+        boolean instantiate= false, start= false, stop= false, close=false, state= false; //required annotations
         String pathToJar = jarDirectory+"\\"+componentName+".jar";
         JarFile jarFile = new JarFile(pathToJar);
         Enumeration<JarEntry> e = jarFile.entries();
@@ -33,7 +32,7 @@ public abstract class ReflectionClassLoader {
         URL[] urls = { new URL("jar:file:" + pathToJar+"!/") };
         URLClassLoader cl = URLClassLoader.newInstance(urls);
 
-        Component component = new Component(componentName);
+        Component component = new Component(componentName, ComponentID);
         while (e.hasMoreElements()) {
             JarEntry je = e.nextElement();
             if (je.isDirectory() || !je.getName().endsWith(".class")) {
@@ -47,7 +46,11 @@ public abstract class ReflectionClassLoader {
 
             //get methods via annotations
             for (Method m : c.getMethods()) {
-                if (m.isAnnotationPresent(Start.class) ) { //Identify annotations via Name
+                if (m.isAnnotationPresent(Instantiate.class) ) { //Identify annotations via Name
+                    component.setInstantiateMethod(m);
+                    instantiate=true;
+                }
+                else if (m.isAnnotationPresent(Start.class) ) { //Identify annotations via Name
                     component.setStartMethod(m);
                     start=true;
                 }
@@ -68,11 +71,9 @@ public abstract class ReflectionClassLoader {
 
             }
         }
-        if(!start || !stop || !state)
+        if(!instantiate || !start || !stop || !state)
             throw new MissingAnnotationException();
         return component;
     }
-
-
 
 }

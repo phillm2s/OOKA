@@ -38,12 +38,12 @@ public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //Componen
     }
 
     @Override
-    public String deployComponent(String path, String componentName) throws ComponentUnavailableException, ComponentNotFoundException, MissingAnnotationException {
+    public String deployComponent(String path, String componentName){
         return rte.deployComponent(path,componentName);
     }
 
     @Override
-    public void removeComponent(String componentID) throws ComponentUnavailableException, ComponentNotFoundException {
+    public void removeComponent(String componentID){
         rte.removeComponent(componentID);
     }
 
@@ -53,17 +53,17 @@ public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //Componen
     }
 
     @Override
-    public ComponentState getComponentState(String componentID) throws ComponentUnavailableException, ComponentNotFoundException, ComponentDelegateException {
+    public ComponentState getComponentState(String componentID){
         return rte.getComponentState(componentID);
     }
 
     @Override
-    public void componentStart(String componentID) throws ComponentUnavailableException, ComponentNotFoundException, AlreadyRunningException {
+    public void componentStart(String componentID){
         rte.componentStart(componentID);
     }
 
     @Override
-    public void componentStop(String componentID) throws ComponentUnavailableException, ComponentNotFoundException, ComponentDelegateException {
+    public void componentStop(String componentID){
         rte.componentStop(componentID);
     }
 

@@ -1,6 +1,6 @@
 package exceptions;
 
-public class ComponentUnavailableException extends Exception{
+public class ComponentUnavailableException extends RuntimeException{
 
     public ComponentUnavailableException(){
         super();

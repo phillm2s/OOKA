@@ -1,6 +1,6 @@
 package rte;
-
-import component.Component;
+import component.IComponent;
+import component.ReflectionClassLoader;
 import dtos.ComponentState;
 import exceptions.*;
 import publishSubscribeServer.IPublishSubscriberServer;
@@ -17,7 +17,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     private boolean running = false;
     private PublishSubscriberServer publishSubscriberServer = new PublishSubscriberServer();
 
-    private HashMap<String,Component> components = new HashMap<>();
+    private HashMap<String, IComponent> components = new HashMap<>();
 
 
     @Override
@@ -27,16 +27,10 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
 
     @Override
     public void rteStop() {
-        for (Component component : components.values()) {
-            try {
-                component.stop();
-                component.close();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        for (IComponent component : components.values()) {
+            component.close();
         }
+        components.clear();
         running=false;
     }
 
@@ -54,7 +48,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
         for(String f : fileNames){
             f= f.replace(".jar","");
             try{
-                ReflectionClassLoader.loadComponentFromFilesystem(path, f);
+                ReflectionClassLoader.loadComponentFromFilesystem(path, f,null);
                 validComponents.add(f);
             }catch(Exception e){
                 System.out.println(f+ "i s no valid Component");
@@ -64,7 +58,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public String deployComponent(String path, String componentName) throws ComponentNotFoundException, ComponentUnavailableException, MissingAnnotationException {
+    public String deployComponent(String path, String componentName){
         if (!running)
             throw new ComponentUnavailableException();
         String id = componentName;
@@ -74,8 +68,9 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
             id = componentName + ++i;
 
         try {
-            Component newComponent = ReflectionClassLoader.loadComponentFromFilesystem(path, componentName);
+            IComponent newComponent = ReflectionClassLoader.loadComponentFromFilesystem(path, componentName, id);
             components.put(id,newComponent);
+            newComponent.instantiate(id);
             if(newComponent.isSubscribable())
                 try {
                     newComponent.subscribe((IPublishSubscriberServer) publishSubscriberServer);
@@ -89,17 +84,13 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public void removeComponent(String componentID) throws ComponentNotFoundException, ComponentUnavailableException {
+    public void removeComponent(String componentID){
         if (!running)
             throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
             throw new ComponentNotFoundException();
 
-        try {
-            components.get(componentID).close();
-        }catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        components.get(componentID).close();
         components.remove(componentID);
     }
 
@@ -112,7 +103,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public ComponentState getComponentState(String componentID) throws ComponentNotFoundException, ComponentUnavailableException, ComponentDelegateException {
+    public ComponentState getComponentState(String componentID){
         if (!running)
             throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
@@ -121,7 +112,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public void componentStart(String componentID) throws ComponentNotFoundException, AlreadyRunningException, ComponentUnavailableException {
+    public void componentStart(String componentID){
         if (!running)
             throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
@@ -130,17 +121,13 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     }
 
     @Override
-    public void componentStop(String componentID) throws ComponentNotFoundException, ComponentUnavailableException, ComponentDelegateException {
+    public void componentStop(String componentID) {
         if (!running)
             throw new ComponentUnavailableException();
         if(!components.containsKey(componentID))
             throw new ComponentNotFoundException(componentID);
-        try {
-            components.get(componentID).stop();
-        } catch (InvocationTargetException |IllegalAccessException e) {
-            throw new ComponentDelegateException();
-        }
 
+        components.get(componentID).stop();
     }
 
 }

@@ -3,17 +3,17 @@
 public class Main {
 
     public static void main(String[] args){
-        new Thread(() -> {
-            Controller.start();
-            System.out.println("A");
-        }).start();
 
-
+        Controller.instantiate("testID");
+        Controller.start();
         try {
-            Thread.sleep(5000);
+            Thread.sleep(6000);
+            Controller.stop();
+            //Controller.start();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Controller.stop();
+
+
     }
 }

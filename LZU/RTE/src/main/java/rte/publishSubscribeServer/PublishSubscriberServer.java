@@ -1,5 +1,6 @@
 package rte.publishSubscribeServer;
 
+import component.IComponent;
 import publishSubscribeServer.IPublishSubscriberServer;
 import publishSubscribeServer.ITopic;
 

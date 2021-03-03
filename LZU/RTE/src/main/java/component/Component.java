@@ -13,13 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class Component{
-    public static final String JAR_DIRECTORY = "..\\componentJars";
-
+class Component implements IComponent{
     private HashMap<String, Class> classes= new HashMap<>();
 
-    private ArrayList<IComponentObserver> iComponentObservers = new ArrayList<>();
-
+    private Method instantiate;
     private Method startMethod;
     private Method stopMethod;
     private Method closeMethod;
@@ -27,78 +24,96 @@ public class Component{
     private Method getStateMethod;
 
     private String name;
-    //private boolean threadRunning=false;
-    //private Thread thread;
+    private String id;
     private boolean started = false;
 
 
 
-    public Component (String name){
+    Component (String name, String id){
         this.name = name;
+        this.id=id;
     }
 
     public void addClass(Class c){
         classes.put(c.getName(), c);
     }
 
+    @Override
+    public void instantiate(String id) {
+        try {
+            instantiate.invoke(null,id);
+        } catch (IllegalAccessException |InvocationTargetException e) {
+            throw new ComponentDelegateException();
+        }
+    }
+
     public void startAsync() throws AlreadyRunningException {
-        if (!started) {
-            new Thread(() -> {
-                try {
-                    System.out.println("thread started.");
-                    startMethod.invoke(null);
-                    System.out.println("thread finished.");
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (Exception e){
-
-                }
-            }).start();
+        new Thread(() -> {
             started=true;
-        }
-        else
-            throw new AlreadyRunningException();
+            try {
+                System.out.println("thread started.");
+                startMethod.invoke(null);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            } finally {
+                started=false;
+                System.out.println("thread finished.");
+            }
+        }).start();
     }
 
-    public void stop() throws InvocationTargetException, IllegalAccessException {
-        if (started) {
+    @Override
+    public void stop() {
+        try {
             stopMethod.invoke(null);
-            started=false;
-        }
-    }
-
-    public void close() throws InvocationTargetException, IllegalAccessException {
-        closeMethod.invoke(null);
-    }
-
-    public ComponentState getState() throws ComponentDelegateException {
-        try{
-            return (ComponentState) getStateMethod.invoke(null);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ComponentDelegateException();
         }
     }
 
-    public void setStartMethod(Method start){
+    @Override
+    public void close(){
+        try {
+            closeMethod.invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ComponentDelegateException();
+        }
+    }
+
+    @Override
+    public ComponentState getState() {
+        try{
+            return ((ComponentState) getStateMethod.invoke(null));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ComponentDelegateException();
+        }
+    }
+
+    void setInstantiateMethod(Method instantiateMethod){
+        this.instantiate=instantiateMethod;
+    }
+
+    void setStartMethod(Method start){
         this.startMethod = start;
     }
 
-    public void setStopMethod(Method stop){
+    void setStopMethod(Method stop){
         this.stopMethod = stop;
     }
 
-    public void setCloseMethod(Method close){
+    void setCloseMethod(Method close){
         this.closeMethod = close;
     }
 
-    public void setSubscribeMethod(Method subscribe) {
+    void setSubscribeMethod(Method subscribe) {
         this.subscribeMethod = subscribe;
     }
 
-    public void setGetStateMethod(Method getState){
+    void setGetStateMethod(Method getState){
         this.getStateMethod = getState;
     }
 
+    @Override
     public void subscribe(IPublishSubscriberServer iPublishSubscriberServer) throws ComponentDelegateException {
         try {
             subscribeMethod.invoke(null,iPublishSubscriberServer);
@@ -107,14 +122,11 @@ public class Component{
         }
     }
 
+    @Override
     public boolean isSubscribable() {
         if (this.subscribeMethod!=null)
             return true;
         return false;
-    }
-
-    public String getName() {
-        return name;
     }
 
 }

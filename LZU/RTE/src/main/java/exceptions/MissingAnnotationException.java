@@ -1,6 +1,6 @@
 package exceptions;
 
-public class MissingAnnotationException extends Exception {
+public class MissingAnnotationException extends RuntimeException {
 
     public MissingAnnotationException(){
         super();

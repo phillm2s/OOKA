@@ -68,7 +68,6 @@ public class CommandLineInterface extends JFrame {
     }
 
     public void close(){
-        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
         this.dispose();
     }
 

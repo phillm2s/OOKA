@@ -1,6 +1,6 @@
 package exceptions;
 
-public class AlreadyRunningException extends Exception{
+public class AlreadyRunningException extends RuntimeException{
 
     public AlreadyRunningException(){
         super();

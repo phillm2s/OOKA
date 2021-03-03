@@ -40,13 +40,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHome" value="E:\Programme\IntelliJ IDEA Community Edition 2020.2.3\plugins\maven\lib\maven3" />
-      </MavenGeneralSettings>
-    </option>
-  </component>
   <component name="ProjectId" id="1lSk0Ehi8oKamitL7VagZAXInCD" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -107,106 +100,7 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="857" y="131" key="#Project_Structure" timestamp="1607597826529">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="857" y="131" key="#Project_Structure/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1607597826529" />
-    <state x="1182" y="272" key="#com.intellij.ide.util.MemberChooser" timestamp="1614526625296">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1182" y="272" key="#com.intellij.ide.util.MemberChooser/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614526625296" />
-    <state x="1071" y="481" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1614353947447">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1071" y="481" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614353947447" />
-    <state x="1076" y="421" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1609704024066">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1076" y="421" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1609704024066" />
-    <state x="1159" y="393" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog" timestamp="1614536172151">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1159" y="393" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614536172151" />
-    <state x="1098" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1614497949610">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1098" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614497949610" />
-    <state x="1107" y="303" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1614441419875">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1107" y="303" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614441419875" />
-    <state width="507" height="466" key="DebuggerActiveHint" timestamp="1614536209837">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="507" height="466" key="DebuggerActiveHint/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614536209837" />
-    <state x="1157" y="311" key="FileChooserDialogImpl" timestamp="1614334372466">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1157" y="311" key="FileChooserDialogImpl/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614334372466" />
-    <state width="2709" height="223" key="GridCell.Tab.0.bottom" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.0.bottom/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.0.center" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.0.center/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.0.left" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.0.left/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.0.right" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.0.right/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.1.bottom" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.1.bottom/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.1.center" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.1.center/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.1.left" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.1.left/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state width="2709" height="223" key="GridCell.Tab.1.right" timestamp="1614713214009">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state width="2709" height="223" key="GridCell.Tab.1.right/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614713214009" />
-    <state x="907" y="211" key="Maven.ArtifactSearchDialog" timestamp="1609704677461">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="907" y="211" key="Maven.ArtifactSearchDialog/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1609704677461" />
-    <state x="1262" y="59" key="SettingsEditor" timestamp="1614424035033">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1262" y="59" key="SettingsEditor/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614424035033" />
-    <state x="1370" y="0" width="1389" height="1118" key="dock-window-1" timestamp="1614354624061">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1370" y="0" width="1389" height="1118" key="dock-window-1/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614354624061" />
-    <state x="817" y="217" key="new project wizard" timestamp="1607598001329">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="817" y="217" key="new project wizard/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1607598001329" />
-    <state x="1039" y="243" width="672" height="678" key="search.everywhere.popup" timestamp="1614688521205">
-      <screen x="0" y="0" width="2752" height="1112" />
-    </state>
-    <state x="1039" y="243" width="672" height="678" key="search.everywhere.popup/0.0.2752.1112/3440.0.2048.1112@0.0.2752.1112" timestamp="1614688521205" />
-  </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/rte/RuntimeEnvironment.java</url>
-          <line>124</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="cl" />

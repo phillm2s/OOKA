@@ -1,6 +1,6 @@
 package exceptions;
 
-public class ComponentDelegateException extends Exception {
+public class ComponentDelegateException extends RuntimeException {
 
     public ComponentDelegateException() {
         super();

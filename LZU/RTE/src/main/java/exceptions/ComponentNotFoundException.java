@@ -1,6 +1,6 @@
 package exceptions;
 
-public class ComponentNotFoundException extends Exception {
+public class ComponentNotFoundException extends RuntimeException {
 
     public ComponentNotFoundException(){
         super();

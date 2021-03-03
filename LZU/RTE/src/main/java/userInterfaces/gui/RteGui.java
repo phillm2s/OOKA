@@ -1,6 +1,6 @@
 package userInterfaces.gui;
 
-import component.Component;
+import component.Config;
 import dtos.ComponentState;
 import exceptions.AlreadyRunningException;
 import exceptions.ComponentDelegateException;
@@ -24,7 +24,7 @@ public class RteGui {
     private JLabel lDeployedComponents;
     private JLabel lActiveComponents;
 
-    private JButton brteStartStop;
+    private JButton bRteStartStop;
 
     private IRuntimeEnvironment rte = null;
     private JPanel mainPanel = null;
@@ -77,12 +77,12 @@ public class RteGui {
                 build(pRte);
         lRteStatus = (JLabel) c.getComponent();
 
-        brteStartStop = (JButton) new ComponentBuilder(new JButton("start")).
+        bRteStartStop = (JButton) new ComponentBuilder(new JButton("start")).
                 placeRight(c).
                 setWidth(100).
                 build(pRte).
                 getComponent();
-        brteStartStop.addActionListener(new ActionListener() {
+        bRteStartStop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(rte.rteGetState().running){
@@ -123,7 +123,7 @@ public class RteGui {
                 build(pDeployableComponents).getComponent();
         headLine.setHorizontalAlignment(SwingConstants.CENTER);
         headLine.setFont(new Font("Serif", Font.PLAIN, 14));
-        ArrayList<String> deployAbleComponents = rte.getDeployableComponents(Component.JAR_DIRECTORY);
+        ArrayList<String> deployAbleComponents = rte.getDeployableComponents(Config.JAR_DIRECTORY);
 
         //placeholder
         ComponentBuilder ref= new LabelBuilder("").
@@ -138,7 +138,7 @@ public class RteGui {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        rte.deployComponent(Component.JAR_DIRECTORY,c);
+                        rte.deployComponent(Config.JAR_DIRECTORY,c);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -177,11 +177,11 @@ public class RteGui {
 
     private void updateGUI(){
         if(rte.rteGetState().running){
-            brteStartStop.setText("stop");
+            bRteStartStop.setText("stop");
             lRteStatus.setText("online");
             lRteStatus.setForeground(Color.GREEN);
         }else{
-            brteStartStop.setText("start");
+            bRteStartStop.setText("start");
             lRteStatus.setText("offline");
             lRteStatus.setForeground(Color.BLACK);
         }
