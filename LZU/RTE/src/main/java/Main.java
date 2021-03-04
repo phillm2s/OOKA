@@ -9,6 +9,5 @@ public class Main {
         IRuntimeEnvironment rte = new RuntimeEnvironmentProxy();
         new RteGui(rte);
         new CommandlineInterpreter( rte ).listen();
-
     }
 }

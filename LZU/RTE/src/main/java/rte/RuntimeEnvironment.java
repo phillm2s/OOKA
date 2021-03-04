@@ -1,4 +1,9 @@
 package rte;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import component.Config;
 import component.IComponent;
 import component.ReflectionClassLoader;
 import dtos.ComponentState;
@@ -8,16 +13,74 @@ import rte.publishSubscribeServer.PublishSubscriberServer;
 import userInterfaces.RTEState;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
 
-public class RuntimeEnvironment implements IRuntimeEnvironment{
+public class RuntimeEnvironment implements IRuntimeEnvironment {
     private boolean running = false;
     private PublishSubscriberServer publishSubscriberServer = new PublishSubscriberServer();
 
-    private HashMap<String, IComponent> components = new HashMap<>();
+    private LinkedHashMap<String, IComponent> components = new LinkedHashMap<>(); //linked hashMap guarantee insert order
 
+
+
+    @Override
+    public String saveConfiguration() {
+        /**
+         * Store the current deployment order persistent to a Json File
+         */
+        String timeStamp = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss").format(Calendar.getInstance().getTime());
+        JsonObject json = new JsonObject();
+        json.addProperty("timestamp", timeStamp);
+        JsonArray deployments = new JsonArray();
+        for (IComponent c : components.values()) {
+            deployments.add(c.getName());
+        }
+        json.add("deployments", deployments);
+
+        FileWriter fw=null;
+        try{
+            fw = new FileWriter(Config.CONFIG_DIRECTORY + "/rte_config_" + timeStamp + ".json");
+            fw.write(json.toString());
+            return Config.CONFIG_DIRECTORY + "/rte_config_" + timeStamp + ".json";
+        }catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }finally {
+            try {
+                fw.flush();
+                fw.close();
+            }catch (Exception e){}
+
+        }
+
+    }
+
+    @Override
+    public void restoreConfiguration(String fileName) throws IOException {
+        /**
+         * Restart RTE and deploy all components like specified in the given json file
+         */
+        if(running)
+            throw new RuntimeException("Restore is only allowed if RTE is not running.");
+        String s=   Files.readString( Paths.get(Config.CONFIG_DIRECTORY+"/"+fileName) );
+        JsonObject json= JsonParser.parseString(s).getAsJsonObject();
+
+        //start rte
+        this.rteStart();
+        //deploy components like stored in file
+        JsonArray deployments = json.get("deployments").getAsJsonArray();
+        for(int i=0; i<deployments.size(); i++){
+            this.deployComponent(Config.JAR_DIRECTORY, deployments.get(i).getAsString());
+        }
+    }
 
     @Override
     public void rteStart() {
@@ -128,5 +191,6 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
 
         components.get(componentID).stop();
     }
+
 
 }

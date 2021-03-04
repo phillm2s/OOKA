@@ -4,6 +4,7 @@ import dtos.ComponentState;
 import exceptions.*;
 import userInterfaces.RTEState;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public interface IRuntimeEnvironment {
@@ -25,7 +26,7 @@ public interface IRuntimeEnvironment {
     /**
      * Deploy a new instance from the given Component and return its new unique id.
      */
-    String deployComponent(String path, String componentName) throws MissingAnnotationException;
+    String deployComponent(String path, String componentName) throws MissingAnnotationException, ComponentNotFoundException;
 
     /**
      * Remove Component instance.
@@ -42,5 +43,14 @@ public interface IRuntimeEnvironment {
     void componentStart(String componentID) throws AlreadyRunningException;
     void componentStop(String componentID);
 
+    /**
+     * Return the path to json file or null if failed
+     */
+    String saveConfiguration();
+
+    /**
+     * @Param: fileName , the name including the type extension
+     */
+    void restoreConfiguration(String fileName) throws IOException;
 
 }

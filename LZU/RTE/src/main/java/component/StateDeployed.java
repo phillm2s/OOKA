@@ -15,12 +15,9 @@ public class StateDeployed implements IComponentState {
         component.setCurrentState(new StateRunning(component));
         new Thread(() -> {
             try {
-                System.out.println("thread started.");
                 component.startMethod.invoke(null);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
-            } finally {
-                System.out.println("thread finished.");
             }
         }).start();
     }

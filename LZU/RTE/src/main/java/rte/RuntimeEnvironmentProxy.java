@@ -5,12 +5,12 @@ import dtos.ComponentState;
 import exceptions.*;
 import userInterfaces.RTEState;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //ComponentAssembler
-    private boolean quit = false;
-    private RuntimeEnvironment rte =new RuntimeEnvironment();
 
+    private RuntimeEnvironment rte =new RuntimeEnvironment();
 
 
     public RuntimeEnvironmentProxy(){
@@ -65,6 +65,16 @@ public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //Componen
     @Override
     public void componentStop(String componentID){
         rte.componentStop(componentID);
+    }
+
+    @Override
+    public String saveConfiguration() {
+        return rte.saveConfiguration();
+    }
+
+    @Override
+    public void restoreConfiguration(String fileName) throws IOException {
+        rte.restoreConfiguration(fileName);
     }
 
 

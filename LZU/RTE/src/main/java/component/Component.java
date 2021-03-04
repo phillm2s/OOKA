@@ -85,6 +85,15 @@ public class Component implements IComponent{
         return false;
     }
 
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String getID() {
+        return this.id;
+    }
 
 
     public void addClass(Class c){

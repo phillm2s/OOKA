@@ -12,6 +12,9 @@ public interface IComponent {
     void subscribe(IPublishSubscriberServer iPublishSubscriberServer);
     boolean isSubscribable();
 
+    public String getName();
+    public String getID();
+
     ComponentState getState();
 
 }
