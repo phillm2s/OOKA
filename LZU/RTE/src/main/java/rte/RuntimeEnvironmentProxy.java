@@ -1,8 +1,6 @@
 package rte;
-//Proxy for LZU
 
 import dtos.ComponentState;
-import exceptions.*;
 import userInterfaces.RTEState;
 
 import java.io.IOException;
