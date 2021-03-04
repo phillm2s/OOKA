@@ -59,7 +59,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment{
     @Override
     public String deployComponent(String path, String componentName){
         if (!running)
-            throw new ComponentUnavailableException();
+            throw new NotRunningException("RTE not running.");
         String id = componentName;
         int i=0;
         //unique component id

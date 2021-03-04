@@ -47,10 +47,10 @@ public class CommandLineInterface extends JFrame {
         inputText.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                print(inputText.getText());
                 for( ICommandLineInterpreter s : subscriber ) {
                     s.handleCommand(inputText.getText());
                 }
-                print(inputText.getText());
                 inputText.setText("");
             }
         });
