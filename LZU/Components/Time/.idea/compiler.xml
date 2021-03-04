@@ -6,8 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="SharedResources" />
         <module name="CLI" />
+        <module name="Time" />
+        <module name="SharedStructures" />
       </profile>
     </annotationProcessing>
   </component>

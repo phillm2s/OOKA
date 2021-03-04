@@ -10,7 +10,7 @@
     </properties>
 
     <groupId>org.example</groupId>
-    <artifactId>Observer</artifactId>
+    <artifactId>SharedStructures</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 

@@ -1,4 +1,3 @@
-
 import annotations.*;
 import dtos.ComponentState;
 import publishSubscribeServer.IComponentObserver;
@@ -30,12 +29,14 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
     }
 
     @Instantiate
-    public static void instantiate(String componentID){
-        instance= new Controller(componentID);
+    public static void instantiate(String componentID) {
+
+        instance = new Controller(componentID);
         if (iPublishSubscriberServer != null)
             iPublishSubscriberServer.createTopic("stateChange")
-                    .notify(new InstantiateEvent().setMessage("Component"+ instance.componentID+" instantiated."));
+                    .notify(new InstantiateEvent().setMessage("Component" + instance.componentID + " instantiated."));
     }
+
 
     @Start
     public static void start() {
@@ -84,10 +85,6 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         cli.print("Subscribe topic: "+topic.getName());
     }
 
-    @Log
-    public static void setLogger(ILogger iLogger){
-
-    }
 
     @State
     public static ComponentState getState(){
