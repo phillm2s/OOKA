@@ -4,38 +4,32 @@ import dtos.ComponentState;
 import exceptions.AlreadyRunningException;
 import exceptions.ComponentDelegateException;
 import publishSubscribeServer.IPublishSubscriberServer;
-import publishSubscribeServer.IComponentObserver;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.channels.ClosedByInterruptException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 
-class Component implements IComponent{
+public class Component implements IComponent{
     private HashMap<String, Class> classes= new HashMap<>();
 
     private Method instantiate;
-    private Method startMethod;
-    private Method stopMethod;
+    Method startMethod;
+    Method stopMethod;
     private Method closeMethod;
     private Method subscribeMethod;
     private Method getStateMethod;
 
     private String name;
     private String id;
-    private boolean started = false;
+    private IComponentState currentState;
 
 
 
     Component (String name, String id){
         this.name = name;
         this.id=id;
-    }
-
-    public void addClass(Class c){
-        classes.put(c.getName(), c);
+        currentState = new StateDeployed(this);
     }
 
     @Override
@@ -47,28 +41,14 @@ class Component implements IComponent{
         }
     }
 
+    @Override
     public void startAsync() throws AlreadyRunningException {
-        new Thread(() -> {
-            started=true;
-            try {
-                System.out.println("thread started.");
-                startMethod.invoke(null);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            } finally {
-                started=false;
-                System.out.println("thread finished.");
-            }
-        }).start();
+        currentState.start();
     }
 
     @Override
     public void stop() {
-        try {
-            stopMethod.invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ComponentDelegateException();
-        }
+        currentState.stop();
     }
 
     @Override
@@ -87,6 +67,32 @@ class Component implements IComponent{
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ComponentDelegateException();
         }
+    }
+
+    @Override
+    public void subscribe(IPublishSubscriberServer iPublishSubscriberServer) throws ComponentDelegateException {
+        try {
+            subscribeMethod.invoke(null,iPublishSubscriberServer);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ComponentDelegateException("Subscription failed");
+        }
+    }
+
+    @Override
+    public boolean isSubscribable() {
+        if (this.subscribeMethod!=null)
+            return true;
+        return false;
+    }
+
+
+
+    public void addClass(Class c){
+        classes.put(c.getName(), c);
+    }
+
+    public void setCurrentState(IComponentState currentState){
+        this.currentState =currentState;
     }
 
     void setInstantiateMethod(Method instantiateMethod){
@@ -113,20 +119,5 @@ class Component implements IComponent{
         this.getStateMethod = getState;
     }
 
-    @Override
-    public void subscribe(IPublishSubscriberServer iPublishSubscriberServer) throws ComponentDelegateException {
-        try {
-            subscribeMethod.invoke(null,iPublishSubscriberServer);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ComponentDelegateException("Subscription failed");
-        }
-    }
-
-    @Override
-    public boolean isSubscribable() {
-        if (this.subscribeMethod!=null)
-            return true;
-        return false;
-    }
 
 }
