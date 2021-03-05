@@ -71,8 +71,8 @@ public class RuntimeEnvironmentProxy implements IRuntimeEnvironment { //Componen
     }
 
     @Override
-    public void restoreConfiguration(String fileName) throws IOException {
-        rte.restoreConfiguration(fileName);
+    public void loadConfiguration(String fileName) throws IOException {
+        rte.loadConfiguration(fileName);
     }
 
 

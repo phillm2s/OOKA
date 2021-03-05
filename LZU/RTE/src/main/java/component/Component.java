@@ -3,6 +3,7 @@ package component;
 import dtos.ComponentState;
 import exceptions.AlreadyRunningException;
 import exceptions.ComponentDelegateException;
+import logger.ILogger;
 import publishSubscribeServer.IPublishSubscriberServer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +20,7 @@ public class Component implements IComponent{
     private Method closeMethod;
     private Method subscribeMethod;
     private Method getStateMethod;
+    private Method setLoggerMethod;
 
     private String name;
     private String id;
@@ -86,6 +88,22 @@ public class Component implements IComponent{
     }
 
     @Override
+    public void log(ILogger ilogger) {
+        try {
+            setLoggerMethod.invoke(null,ilogger);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ComponentDelegateException("Logger injection failed");
+        }
+    }
+
+    @Override
+    public boolean isLoggable() {
+        if (this.setLoggerMethod!=null)
+            return true;
+        return false;
+    }
+
+    @Override
     public String getName() {
         return this.name;
     }
@@ -128,5 +146,8 @@ public class Component implements IComponent{
         this.getStateMethod = getState;
     }
 
+    void setSetLoggerMethod(Method setLoggerMethod){
+        this.setLoggerMethod = setLoggerMethod;
+    }
 
 }

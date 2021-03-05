@@ -6,9 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
-public class CommandLineInterface extends JFrame {
-    private static CommandLineInterface instance = null;
-
+public class CommandLineInterface extends JFrame implements IcommandLineInterface {
     private ArrayList<ICommandLineInterpreter> subscriber = new ArrayList<>();
 
     private JPanel mainPanel;
@@ -16,7 +14,7 @@ public class CommandLineInterface extends JFrame {
     private JTextField inputText;
     private JScrollPane scrollPane;
 
-    private CommandLineInterface(){
+    public CommandLineInterface(){
         super("view.CommandLineInterface");
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.setSize(630,330);
@@ -61,6 +59,7 @@ public class CommandLineInterface extends JFrame {
         this.setResizable(false);
     }
 
+    @Override
     public void print(String msg){
         //scroll to the end
         textArea.append("\n"+msg);
@@ -79,10 +78,5 @@ public class CommandLineInterface extends JFrame {
         subscriber.remove(cli);
     }
 
-    public static CommandLineInterface getInstance() {
-        if( instance==null)
-            instance = new CommandLineInterface();
-        return instance;
-    }
 
 }

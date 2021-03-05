@@ -64,6 +64,8 @@ public abstract class ReflectionClassLoader {
                 }
                 else if (m.isAnnotationPresent(Subscribe.class) )
                     component.setSubscribeMethod(m);
+                else if (m.isAnnotationPresent(Log.class) )
+                    component.setSetLoggerMethod(m);
                 else if (m.isAnnotationPresent(State.class) ) { //annotation.annotationType().getSimpleName().equals("State")
                     component.setGetStateMethod(m);
                     state=true;

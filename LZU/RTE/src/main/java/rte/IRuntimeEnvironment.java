@@ -30,7 +30,6 @@ public interface IRuntimeEnvironment {
 
     /**
      * Remove Component instance.
-     * Running instances dont get interrupted!
      */
     void removeComponent(String componentID);
 
@@ -51,6 +50,6 @@ public interface IRuntimeEnvironment {
     /**
      * @Param: fileName , the name including the type extension
      */
-    void restoreConfiguration(String fileName) throws IOException;
+    void loadConfiguration(String fileName) throws IOException;
 
 }

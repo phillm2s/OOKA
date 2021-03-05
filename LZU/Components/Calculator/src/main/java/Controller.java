@@ -1,5 +1,8 @@
 import annotations.*;
 import dtos.ComponentState;
+import logger.ILogger;
+import logger.LogReceivedHandler;
+import logger.LoggerFactory;
 import publishSubscribeServer.IComponentObserver;
 import publishSubscribeServer.IPublishSubscriberServer;
 import publishSubscribeServer.ITopic;
@@ -7,17 +10,18 @@ import publishSubscribeServer.events.*;
 
 public class Controller implements ICommandLineInterpreter, IComponentObserver {
     private static Controller instance = null;
-    private static CommandLineInterface cli = CommandLineInterface.getInstance();
-    private static IPublishSubscriberServer iPublishSubscriberServer;
+    private static CommandLineInterface cli= null;
+    private static IPublishSubscriberServer iPublishSubscriberServer= null;
+    private static ILogger iLogger= null;
 
 
     private String componentID;
     private String componentName= "Calculator";
     private Calculator calculator;
 
-
     private Controller(String componentID){
         this.componentID = componentID;
+        cli = new CommandLineInterface();
         cli.setTitle(componentName+" Component::"+componentID);
         cli.subscribe(this);
         cli.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -27,7 +31,18 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
                 cli.dispose();
             }
         });
+//        //all logger created with this factory will trigger this event.
+//        LoggerFactory.addLogReceivedHandler(new LogReceivedHandler() {
+//            @Override
+//            public void logReceivedEvent(String log) {
+//                cli.print(log);
+//            }
+//        });
         calculator= new Calculator();
+    }
+
+    public static IcommandLineInterface cli(){
+        return cli;
     }
 
     @Instantiate
@@ -37,6 +52,8 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         if (iPublishSubscriberServer != null)
             iPublishSubscriberServer.createTopic("stateChange")
                     .notify(new InstantiateEvent().setMessage("Component" + instance.componentID + " instantiated."));
+        if(iLogger!=null)
+            iLogger.sendLog("Component instanzieiert");
     }
 
     @Start
@@ -46,6 +63,9 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
                 iPublishSubscriberServer.createTopic("stateChange")
                         .notify(new StartEvent()
                                 .setMessage("Component"+ instance.componentID+" started."));
+            if(iLogger!=null)
+                iLogger.sendLog("Prozess gestartet");
+
             instance.calculator.enable();
             cli.print("Component started");
         }
@@ -60,6 +80,8 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
             if (iPublishSubscriberServer != null)
                 iPublishSubscriberServer.createTopic("stateChange")
                         .notify(new StopEvent().setMessage("Component" + instance.componentID + " stopped."));
+            if(iLogger!=null)
+                iLogger.sendLog("Component gestoppt");
 
             instance.calculator.disable();
             cli.print("Component stopped");
@@ -72,6 +94,8 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         if (iPublishSubscriberServer != null)
             iPublishSubscriberServer.createTopic("stateChange")
                     .notify(new CloseEvent().setMessage("Component"+ instance.componentID+" closed."));
+        if(iLogger!=null)
+            iLogger.sendLog("Component beendet");
         cli.close();
     }
 
@@ -83,18 +107,27 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         ITopic topic = iPublishSubscriberServer.createTopic("stateChange");
         topic.subscribe((IComponentObserver) instance);
 
+        if(iLogger!=null)
+            iLogger.sendLog("PubsubServer injected");
+
         cli.print("Subscribe topic: "+topic.getName());
     }
 
+    @Log
+    public static void setLogger(ILogger iLogger){
+        Controller.iLogger = iLogger;
+        cli.print("logger injected.");
+    }
 
     @State
     public static ComponentState getState(){
+        if(iLogger!=null)
+            iLogger.sendLog("Component Status requested");
         return new ComponentState()
                 .setIsRunning(instance.calculator.isRunning())
                 .setComponentName("Time")
                 .setComponentID(instance.componentID);
     }
-
 
 
     @Override
@@ -103,6 +136,11 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
             cli.print("Calculator is not Running!");
             return;
         }
+        if(!(input.contains("+")
+                || input.contains("-")
+                || input.contains("*")
+                || input.contains("/")))
+            return;
 
         String[] values=input.split("(\\+)|(-)|(\\*)|(/)");
         int v1 = Integer.parseInt(values[0]);

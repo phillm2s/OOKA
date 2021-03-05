@@ -1,6 +1,5 @@
 package userInterfaces.gui;
 
-import component.Component;
 import component.Config;
 import dtos.ComponentState;
 import exceptions.AlreadyRunningException;
@@ -13,7 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -100,7 +98,7 @@ public class RteGui extends JFrame {
                 String file= fd.getFile();
                 if(file==null)
                     return;
-                rte.restoreConfiguration(file);
+                rte.loadConfiguration(file);
                 bLoad.setEnabled(false);
                 bSave.setEnabled(true);
                 updateGUI();

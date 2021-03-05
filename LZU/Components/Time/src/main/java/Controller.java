@@ -7,7 +7,7 @@ import publishSubscribeServer.events.*;
 
 public class Controller implements ICommandLineInterpreter, IComponentObserver {
     private static Controller instance = null;
-    private static CommandLineInterface cli = CommandLineInterface.getInstance();
+    private static CommandLineInterface cli; //= CommandLineInterface.getInstance();
     private static IPublishSubscriberServer iPublishSubscriberServer;
 
     private CurrentTime currentTime;
@@ -16,6 +16,7 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
 
     private Controller(String componentID){
         this.componentID = componentID;
+        cli = new CommandLineInterface();
         cli.setTitle("Time Component::"+componentID);
         cli.subscribe(this);
         cli.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -26,6 +27,10 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
             }
         });
         currentTime= new CurrentTime();
+    }
+
+    public static IcommandLineInterface cli(){
+        return cli;
     }
 
     @Instantiate

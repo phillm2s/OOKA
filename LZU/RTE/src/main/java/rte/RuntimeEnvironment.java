@@ -2,18 +2,19 @@ package rte;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import component.Config;
 import component.IComponent;
 import component.ReflectionClassLoader;
 import dtos.ComponentState;
 import exceptions.*;
+import logger.LogReceivedHandler;
+import logger.LoggerFactory;
 import publishSubscribeServer.IPublishSubscriberServer;
+import logger.Logger;
 import rte.publishSubscribeServer.PublishSubscriberServer;
 import userInterfaces.RTEState;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,9 +27,19 @@ import java.util.LinkedHashMap;
 public class RuntimeEnvironment implements IRuntimeEnvironment {
     private boolean running = false;
     private PublishSubscriberServer publishSubscriberServer = new PublishSubscriberServer();
+    private Logger componentLogger;
 
     private LinkedHashMap<String, IComponent> components = new LinkedHashMap<>(); //linked hashMap guarantee insert order
 
+    public RuntimeEnvironment(){
+        componentLogger = new Logger()
+                .addLogReceivedHandler(new LogReceivedHandler() {
+                        @Override
+                        public void logReceivedEvent(String log) {
+                            System.out.println(log);
+                        }
+                    });
+    }
 
 
     @Override
@@ -64,7 +75,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
-    public void restoreConfiguration(String fileName) throws IOException {
+    public void loadConfiguration(String fileName) throws IOException {
         /**
          * Restart RTE and deploy all components like specified in the given json file
          */
@@ -134,11 +145,10 @@ public class RuntimeEnvironment implements IRuntimeEnvironment {
             components.put(id,newComponent);
             newComponent.instantiate(id);
             if(newComponent.isSubscribable())
-                try {
-                    newComponent.subscribe((IPublishSubscriberServer) publishSubscriberServer);
-                }catch (ComponentDelegateException e){
-                    e.printStackTrace();
-                }
+                 newComponent.subscribe((IPublishSubscriberServer) publishSubscriberServer);
+            if(newComponent.isLoggable())
+                newComponent.log(componentLogger);
+
             return id;
         } catch (IOException | ClassNotFoundException e) {
             throw new ComponentNotFoundException();

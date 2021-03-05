@@ -9,7 +9,7 @@ public class CurrentTime {
             waitHandle.reset();
             do {
                 String timeStamp = new SimpleDateFormat("dd.MM.yyyy_HH:mm:ss").format(Calendar.getInstance().getTime());
-                CommandLineInterface.getInstance().print("Test annotations.Component running. "+ timeStamp);
+                Controller.cli().print("Test annotations.Component running. "+ timeStamp);
             }while(!waitHandle.waitFor(2000));
         }).start();
     }
