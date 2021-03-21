@@ -1,5 +1,6 @@
 package rte;
 
+import component.IComponent;
 import dtos.ComponentState;
 import exceptions.*;
 import userInterfaces.RTEState;
@@ -24,9 +25,9 @@ public interface IRuntimeEnvironment {
     ArrayList<String> getDeployableComponents(String path);
 
     /**
-     * Deploy a new instance from the given Component and return its new unique id.
+     * Deploy a new instance from the given Component and return its interface.
      */
-    String deployComponent(String path, String componentName) throws MissingAnnotationException, ComponentNotFoundException;
+    IComponent deployComponent(String path, String componentName) throws MissingAnnotationException, ComponentNotFoundException;
 
     /**
      * Remove Component instance.

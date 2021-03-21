@@ -26,19 +26,11 @@ import java.util.LinkedHashMap;
 
 public class RuntimeEnvironment implements IRuntimeEnvironment {
     private boolean running = false;
-    private PublishSubscriberServer publishSubscriberServer = new PublishSubscriberServer();
-    private Logger componentLogger;
 
     private LinkedHashMap<String, IComponent> components = new LinkedHashMap<>(); //linked hashMap guarantee insert order
 
     public RuntimeEnvironment(){
-        componentLogger = new Logger()
-                .addLogReceivedHandler(new LogReceivedHandler() {
-                        @Override
-                        public void logReceivedEvent(String log) {
-                            System.out.println(log);
-                        }
-                    });
+
     }
 
 
@@ -131,7 +123,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
-    public String deployComponent(String path, String componentName){
+    public IComponent deployComponent(String path, String componentName){
         if (!running)
             throw new NotRunningException("RTE not running.");
         String id = componentName;
@@ -144,12 +136,7 @@ public class RuntimeEnvironment implements IRuntimeEnvironment {
             IComponent newComponent = ReflectionClassLoader.loadComponentFromFilesystem(path, componentName, id);
             components.put(id,newComponent);
             newComponent.instantiate(id);
-            if(newComponent.isSubscribable())
-                 newComponent.subscribe((IPublishSubscriberServer) publishSubscriberServer);
-            if(newComponent.isLoggable())
-                newComponent.log(componentLogger);
-
-            return id;
+            return newComponent;
         } catch (IOException | ClassNotFoundException e) {
             throw new ComponentNotFoundException();
         }

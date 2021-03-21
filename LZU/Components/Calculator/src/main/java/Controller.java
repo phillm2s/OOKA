@@ -45,8 +45,8 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         return cli;
     }
 
-    @Instantiate
-    public static void instantiate(String componentID) {
+    @PostConstruct
+    public static void postConstruct(String componentID) {
 
         instance = new Controller(componentID);
         if (iPublishSubscriberServer != null)
@@ -88,7 +88,7 @@ public class Controller implements ICommandLineInterpreter, IComponentObserver {
         }
     }
 
-    @Close
+    @PreDestroy
     public static void close(){
         stop();
         if (iPublishSubscriberServer != null)

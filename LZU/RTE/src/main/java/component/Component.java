@@ -14,10 +14,10 @@ import java.util.HashMap;
 public class Component implements IComponent{
     private HashMap<String, Class> classes= new HashMap<>();
 
-    private Method instantiate;
+    private Method postConstruct;
     Method startMethod;
     Method stopMethod;
-    private Method closeMethod;
+    private Method preDestroy;
     private Method subscribeMethod;
     private Method getStateMethod;
     private Method setLoggerMethod;
@@ -37,7 +37,7 @@ public class Component implements IComponent{
     @Override
     public void instantiate(String id) {
         try {
-            instantiate.invoke(null,id);
+            postConstruct.invoke(null,id);
         } catch (IllegalAccessException |InvocationTargetException e) {
             throw new ComponentDelegateException();
         }
@@ -56,7 +56,7 @@ public class Component implements IComponent{
     @Override
     public void close(){
         try {
-            closeMethod.invoke(null);
+            preDestroy.invoke(null);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ComponentDelegateException();
         }
@@ -122,8 +122,8 @@ public class Component implements IComponent{
         this.currentState =currentState;
     }
 
-    void setInstantiateMethod(Method instantiateMethod){
-        this.instantiate=instantiateMethod;
+    void setPostConstruct(Method postConstruct){
+        this.postConstruct =postConstruct;
     }
 
     void setStartMethod(Method start){
@@ -134,8 +134,8 @@ public class Component implements IComponent{
         this.stopMethod = stop;
     }
 
-    void setCloseMethod(Method close){
-        this.closeMethod = close;
+    void setPreDestroyMethod(Method preDestroy){
+        this.preDestroy = preDestroy;
     }
 
     void setSubscribeMethod(Method subscribe) {

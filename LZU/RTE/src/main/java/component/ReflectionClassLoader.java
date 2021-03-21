@@ -1,7 +1,6 @@
 package component;
 
 import annotations.*;
-import component.Component;
 import exceptions.MissingAnnotationException;
 
 import java.io.IOException;
@@ -20,11 +19,9 @@ public abstract class ReflectionClassLoader {
          * @param jarDirectory path to the directory
          * @param componentName exclusive .jar
          * @return component.Component
-         * @throws IOException
-         * @throws ClassNotFoundException
          */
 
-        boolean instantiate= false, start= false, stop= false, close=false, state= false; //required annotations
+        boolean postConstruct= false, start= false, stop= false, preDestroy=false, state= false; //required annotations
         String pathToJar = jarDirectory+"\\"+componentName+".jar";
         JarFile jarFile = new JarFile(pathToJar);
         Enumeration<JarEntry> e = jarFile.entries();
@@ -46,9 +43,9 @@ public abstract class ReflectionClassLoader {
 
             //get methods via annotations
             for (Method m : c.getMethods()) {
-                if (m.isAnnotationPresent(Instantiate.class) ) { //Identify annotations via Name
-                    component.setInstantiateMethod(m);
-                    instantiate=true;
+                if (m.isAnnotationPresent(PostConstruct.class) ) { //Identify annotations via Name
+                    component.setPostConstruct(m);
+                    postConstruct=true;
                 }
                 else if (m.isAnnotationPresent(Start.class) ) { //Identify annotations via Name
                     component.setStartMethod(m);
@@ -58,9 +55,9 @@ public abstract class ReflectionClassLoader {
                     component.setStopMethod(m);
                     stop=true;
                 }
-                else if (m.isAnnotationPresent(Close.class) ) {
-                    component.setCloseMethod(m);
-                    close=true;
+                else if (m.isAnnotationPresent(PreDestroy.class) ) {
+                    component.setPreDestroyMethod(m);
+                    preDestroy=true;
                 }
                 else if (m.isAnnotationPresent(Subscribe.class) )
                     component.setSubscribeMethod(m);
@@ -73,7 +70,7 @@ public abstract class ReflectionClassLoader {
 
             }
         }
-        if(!instantiate || !start || !stop || !state)
+        if(!postConstruct || !start || !stop || !state)
             throw new MissingAnnotationException();
         return component;
     }
